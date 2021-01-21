@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LcmInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Salman\Mqtt\MqttClass\Mqtt;
 
 class LcmController extends Controller
 {
@@ -39,5 +40,25 @@ class LcmController extends Controller
             ->where('lcm_ip', '=', $request->input('device_ip'))
             ->get();
         return response()->json($data, 200);
+    }
+
+    public function mqtt(Request $request)
+    {
+        $message = $request->input('message');
+        $this->SendMsgViaMqtt($message);
+        return response()->json(true, 200);
+    }
+
+    public function SendMsgViaMqtt($message)
+    {
+        $mqtt = new Mqtt();
+        $client_id = 'test';
+        $output = $mqtt->ConnectAndPublish('lcmData', $message, $client_id);
+
+        if ($output === true) {
+            return "published";
+        }
+
+        return "Failed";
     }
 }
