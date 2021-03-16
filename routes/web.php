@@ -22,3 +22,4 @@ Route::post('/mqtt', 'LcmController@mqtt')->middleware('cors');
 Route::post('/updateLcmModel', 'LcmController@updateLcmModel')->middleware('cors');
 Route::post('/getStatus', 'LcmController@getStatus')->middleware('cors');
 Route::apiResource('/model', 'ModelController');
+Route::apiResource('/firmware', 'FirmwareController')->middleware('cors');

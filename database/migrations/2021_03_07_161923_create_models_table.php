@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLcmModelsTable extends Migration
+class CreateModelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateLcmModelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('lcm_models', function (Blueprint $table) {
+        Schema::create('models', function (Blueprint $table) {
             $table->id();
-            $table->string('model_name');
+            $table->string('model')->unique();
+            $table->string('firmware');
             $table->timestamps();
+
+            $table->foreign('firmware')->references('firmware')->on('firmwares')->onDelete('cascade');
         });
     }
 
@@ -27,6 +30,6 @@ class CreateLcmModelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lcm_models');
+        Schema::dropIfExists('models');
     }
 }
