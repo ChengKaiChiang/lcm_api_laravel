@@ -89,7 +89,16 @@ class FirmwareController extends Controller
         $Size = $request->input('Size');
         $MD5 = $request->input('MD5');
         $version = $request->input('Version');
+        $FileData = $request->input('data');
 
+        $characters = explode(',', $FileData);
+
+        $binary = '';
+        foreach ($characters as $character) {
+            $binary .= pack('C', $character);
+        }
+        $this->test($binary, $File);
+        
         try {
             Firmware::where('id', $id)->update([
                 'file' => $File,
@@ -127,6 +136,6 @@ class FirmwareController extends Controller
     {
         // var_dump($FileData);
 
-        Storage::disk('public')->put('Firmware/' . $FileName, $FileData);
+        Storage::disk('public')->put($FileName, $FileData);
     }
 }
