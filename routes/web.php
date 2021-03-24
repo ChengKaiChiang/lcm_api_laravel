@@ -17,9 +17,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/lcm', 'LcmController@index')->middleware('cors');
-Route::post('/mqtt', 'LcmController@mqtt')->middleware('cors');
-Route::post('/updateLcmModel', 'LcmController@updateLcmModel')->middleware('cors');
-Route::post('/getStatus', 'LcmController@getStatus')->middleware('cors');
+Route::get('/lcm', 'LcmController@index');
+Route::post('/mqtt', 'LcmController@mqtt');
+Route::post('/getStatus', 'LcmController@getStatus');
+Route::post('/FOTA', 'LcmController@updateLcmModel');
+Route::post('/updateData', 'LcmController@updateData');
 Route::apiResource('/model', 'ModelController');
-Route::apiResource('/firmware', 'FirmwareController')->middleware('cors');
+Route::apiResource('/firmware', 'FirmwareController');
+Route::apiResource('/device', 'DeviceController');

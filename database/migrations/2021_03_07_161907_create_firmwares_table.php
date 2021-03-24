@@ -16,6 +16,7 @@ class CreateFirmwaresTable extends Migration
         Schema::create('firmwares', function (Blueprint $table) {
             $table->id();
             $table->string('firmware')->unique();
+            $table->string('file');
             $table->unsignedInteger('size');
             $table->string('version');
             $table->string('MD5', 32);

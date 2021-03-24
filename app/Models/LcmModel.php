@@ -10,10 +10,11 @@ class LcmModel extends Model
     use HasFactory;
 
     protected $table = 'models';
-    protected $fillable = ['model'];
+    protected $fillable = ['model', 'firmware'];
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function firmware()
     {
-        return $this->belongsTo(Firmware::class, 'firmware', 'firmware');
+        return $this->hasOne(Firmware::class, 'id', 'firmware');
     }
 }

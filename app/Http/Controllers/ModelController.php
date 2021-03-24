@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\LcmModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ModelController extends Controller
 {
@@ -16,7 +15,7 @@ class ModelController extends Controller
     public function index()
     {
         //
-        return response()->json(['data' => LcmModel::select('id', 'model_name')->get()], 200);
+        return response()->json(['data' => LcmModel::with('firmware')->get()], 200);
     }
 
     /**
@@ -27,14 +26,22 @@ class ModelController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        // $data = $request->input('model');
-        // foreach ($data as $x) {
-        //     LcmModel::create([
-        //         'model_name' => $x
-        //     ]);
-        // }
-        return response()->json($request, 200);
+        $Model = $request->input('Model');
+        $Firmware = $request->input('Firmware');
+        try {
+            LcmModel::create([
+                'model' => $Model,
+                'firmware' => $Firmware,
+            ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+            // var_dump($errorInfo[1]);
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1]], 400);
+            // Return the response to the client..
+        }
+        return response()->json(['status' => 'OK'], 200);
     }
 
     /**
@@ -46,6 +53,7 @@ class ModelController extends Controller
     public function show($id)
     {
         //
+        return response()->json(['data' => LcmModel::with('firmware')->find($id)], 200);
     }
 
     /**
@@ -58,6 +66,21 @@ class ModelController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $Firmware = $request->input('Firmware');
+
+        try {
+            LcmModel::where('id', $id)->update([
+                'firmware' => $Firmware,
+            ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1]], 400);
+            // Return the response to the client..
+        }
+
+        return response()->json(['status' => 'OK'], 200);
     }
 
     /**
@@ -69,6 +92,9 @@ class ModelController extends Controller
     public function destroy($id)
     {
         //
-        return response()->json($id, 200);
+        $flight = LcmModel::find($id);
+        $flight->delete();
+
+        return response()->json(['status' => 'OK'], 200);
     }
 }

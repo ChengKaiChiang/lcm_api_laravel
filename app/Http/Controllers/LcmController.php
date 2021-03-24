@@ -6,6 +6,7 @@ use App\Models\LcmInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Salman\Mqtt\MqttClass\Mqtt;
+use Carbon\Carbon;
 
 class LcmController extends Controller
 {
@@ -25,35 +26,54 @@ class LcmController extends Controller
 
     public function updateLcmModel(Request $request)
     {
-        $lcm_id = explode(',', $request->input('id'));
-        $model = $request->input('model');
-        foreach ($lcm_id as $x) {
-            LcmInfo::where('id', $x)->update(['lcm_model' => $model]);
-        }
-        return response()->json(true, 200);
+        $MqttMessage = json_encode($request->all());
+        $a = $this->SendMsgViaMqtt($MqttMessage);
+        return response()->json($a, 200);
     }
 
     public function getStatus(Request $request)
     {
-        $data = DB::table('lcm_status')
-            ->where('color', '=', $request->input('color'))
-            ->where('lcm_ip', '=', $request->input('device_ip'))
+        $Device = $request->input('device');
+        $Position = $request->input('position');
+        $Color = $request->input('color');
+        $data = DB::table('lcm_datas')
+            ->where('color', '=', $Color)
+            ->where('device', '=', $Device)
+            ->where('position', '=', $Position)
             ->get();
         return response()->json($data, 200);
     }
 
-    public function mqtt(Request $request)
+    public function updateData(Request $request)
     {
-        $message = $request->input('message');
-        $this->SendMsgViaMqtt($message);
-        return response()->json(true, 200);
+        $Device = $request->input('deviceID');
+        $Position = $request->input('deviceLocation');
+        $Color = $request->input('color');
+        $Lpower = $request->input('lcm_power');
+        $Lcurrent = $request->input('lcm_current');
+        $Bpower = $request->input('backlight_power');
+        $Bcurrent = $request->input('backlight_current');
+
+        DB::table('lcm_datas')
+            ->where('color', '=', $Color)
+            ->where('device', '=', $Device)
+            ->where('position', '=', $Position)
+            ->update([
+                'lcm_power' => $Lpower,
+                'lcm_current' => $Lcurrent,
+                'backlight_power' => $Bpower,
+                'backlight_current' => $Bcurrent,
+                'updated_at' => Carbon::now(),
+            ]);
+        return response()->json(['status' => 'OK'], 200);
     }
+
 
     public function SendMsgViaMqtt($message)
     {
         $mqtt = new Mqtt();
         $client_id = 'test';
-        $output = $mqtt->ConnectAndPublish('lcmData', $message, $client_id);
+        $output = $mqtt->ConnectAndPublish('OTA/UPDATE/NOTIFY', $message, $client_id);
 
         if ($output === true) {
             return "published";

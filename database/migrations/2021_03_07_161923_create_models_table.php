@@ -16,10 +16,10 @@ class CreateModelsTable extends Migration
         Schema::create('models', function (Blueprint $table) {
             $table->id();
             $table->string('model')->unique();
-            $table->string('firmware');
+            $table->unsignedBigInteger('firmware');
             $table->timestamps();
 
-            $table->foreign('firmware')->references('firmware')->on('firmwares')->onDelete('cascade');
+            $table->foreign('firmware')->references('id')->on('firmwares')->onDelete('cascade');
         });
     }
 

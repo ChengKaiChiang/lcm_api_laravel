@@ -15,14 +15,15 @@ class CreateLcmDatasTable extends Migration
     {
         Schema::create('lcm_datas', function (Blueprint $table) {
             $table->string('device');
+            $table->string('position');
             $table->string('color');
             $table->double('lcm_power')->nullable();
             $table->double('lcm_current')->nullable();
             $table->double('backlight_power')->nullable();
             $table->double('backlight_current')->nullable();
             $table->timestamps();
-            $table->primary(['device', 'color']);
-            $table->foreign('device')->references('device')->on('devices')->onDelete('cascade');
+            $table->primary(['device', 'position', 'color']);
+            $table->foreign(['device', 'position'])->references(['device', 'position'])->on('devices')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

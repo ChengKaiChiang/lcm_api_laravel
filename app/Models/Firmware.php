@@ -10,6 +10,6 @@ class Firmware extends Model
     use HasFactory;
 
     protected $table = 'firmwares';
-    protected $fillable = ['firmware', 'size', 'version', 'MD5'];
+    protected $fillable = ['id', 'firmware', 'file', 'size', 'version', 'MD5'];
     protected $hidden = ['created_at', 'updated_at'];
 }

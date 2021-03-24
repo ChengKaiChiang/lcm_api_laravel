@@ -9,10 +9,6 @@ class Device extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['model'];
-
-    public function firmware()
-    {
-        return $this->belongsTo(Firmware::class, 'firmware', 'firmware');
-    }
+    protected $fillable = ['device', 'position', 'status', 'model', 'firmware', 'version', 'description'];
+    // protected $hidden = ['created_at', 'updated_at'];
 }
