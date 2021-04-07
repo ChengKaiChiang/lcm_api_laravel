@@ -22,6 +22,7 @@ Route::post('/mqtt', 'LcmController@mqtt');
 Route::post('/getStatus', 'LcmController@getStatus');
 Route::post('/FOTA', 'LcmController@updateLcmModel');
 Route::post('/updateData', 'LcmController@updateData');
+Route::put('/setDeviceOffline/{id}', 'DeviceController@setDeviceOffline');
 Route::apiResource('/model', 'ModelController');
 Route::apiResource('/firmware', 'FirmwareController');
 Route::apiResource('/device', 'DeviceController');

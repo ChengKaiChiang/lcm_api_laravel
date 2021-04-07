@@ -7,7 +7,7 @@
  */
 
 return [
-    'host'      => env('MQTT_HOST', '192.168.0.5'),
+    'host'      => env('MQTT_HOST', ''),
     'password'  => env('MQTT_PASSWORD', ''),
     'username'  => env('MQTT_USERNAME', ''),
     'certfile'  => env('MQTT_CERT_FILE', ''),

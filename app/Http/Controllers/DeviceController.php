@@ -18,7 +18,7 @@ class DeviceController extends Controller
     public function index()
     {
         //
-        return response()->json(['data' => Device::all()], 200);
+        return response()->json(['data' => Device::all(), 'now_time' => date("Y-m-d H:i:s")], 200);
     }
 
     /**
@@ -133,5 +133,31 @@ class DeviceController extends Controller
     public function destroy($id)
     {
         //
+        $flight = Device::find($id);
+        $flight->delete();
+
+        return response()->json(['status' => 'OK'], 200);
+    }
+
+
+    public function setDeviceOffline($id)
+    {
+        //
+        try {
+            $flight = Device::find($id);
+
+            $flight->lcm_status = 0;
+            $flight->status = -1;
+
+            $flight->save();
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+            // var_dump($errorInfo[1]);
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1], 'DataBase_Error' => $errorInfo[2]], 400);
+            // Return the response to the client..
+        }
+        return response()->json(['status' => 'OK'], 200);
     }
 }

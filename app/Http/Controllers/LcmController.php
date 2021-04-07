@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LcmInfo;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Salman\Mqtt\MqttClass\Mqtt;
@@ -26,22 +27,51 @@ class LcmController extends Controller
 
     public function updateLcmModel(Request $request)
     {
-        $MqttMessage = json_encode($request->all());
-        $a = $this->SendMsgViaMqtt($MqttMessage);
-        return response()->json($a, 200);
+        $Datas = $request->all();
+        unset($Datas['id']);
+
+        $Devices = $request->input('id');
+
+        foreach ($Devices as $Device) {
+            $id = $Device['device'] . '_' . $Device['position'];
+            $MqttMessage = json_encode($Datas);
+            $this->SendMsgViaMqtt($MqttMessage, $id);
+        }
+        return response()->json('OK', 200);
     }
 
     public function getStatus(Request $request)
     {
         $Device = $request->input('device');
         $Position = $request->input('position');
-        $Color = $request->input('color');
-        $data = DB::table('lcm_datas')
-            ->where('color', '=', $Color)
+        $datas = DB::table('lcm_datas')
             ->where('device', '=', $Device)
             ->where('position', '=', $Position)
             ->get();
-        return response()->json($data, 200);
+        $arr = array();
+        foreach ($datas as $data) {
+            switch ($data->color) {
+                case "White":
+                    $arr += ['light' => $data];
+                    break;
+                case "Black":
+                    $arr += ['dark' => $data];
+                    break;
+                case "Red":
+                    $arr += ['danger' => $data];
+                    break;
+                case "Green":
+                    $arr += ['success' => $data];
+                    break;
+                case "Blue":
+                    $arr += ['primary' => $data];
+                    break;
+                case "V127":
+                    $arr += ['secondary' => $data];
+                    break;
+            }
+        };
+        return response()->json([$arr], 200);
     }
 
     public function updateData(Request $request)
@@ -65,15 +95,29 @@ class LcmController extends Controller
                 'backlight_current' => $Bcurrent,
                 'updated_at' => Carbon::now(),
             ]);
+
+        if ($Bcurrent > 340 || $Bcurrent < 330) {
+            Device::where('device', '=', $Device)
+                ->where('position', '=', $Position)
+                ->update([
+                    'lcm_status' => 2
+                ]);
+        } else {
+            Device::where('device', '=', $Device)
+                ->where('position', '=', $Position)
+                ->update([
+                    'lcm_status' => 1
+                ]);
+        }
         return response()->json(['status' => 'OK'], 200);
     }
 
 
-    public function SendMsgViaMqtt($message)
+    public function SendMsgViaMqtt($message, $id)
     {
         $mqtt = new Mqtt();
         $client_id = 'test';
-        $output = $mqtt->ConnectAndPublish('OTA/UPDATE/NOTIFY', $message, $client_id);
+        $output = $mqtt->ConnectAndPublish('OTA/UPDATE/NOTIFY/' . $id, $message, $client_id);
 
         if ($output === true) {
             return "published";
