@@ -100,13 +100,15 @@ class LcmController extends Controller
             Device::where('device', '=', $Device)
                 ->where('position', '=', $Position)
                 ->update([
-                    'lcm_status' => 2
+                    'lcm_status' => 2,
+                    'status' => 0,
                 ]);
         } else {
             Device::where('device', '=', $Device)
                 ->where('position', '=', $Position)
                 ->update([
-                    'lcm_status' => 1
+                    'lcm_status' => 1,
+                    'status' => 0,
                 ]);
         }
         return response()->json(['status' => 'OK'], 200);
