@@ -33,7 +33,7 @@ class LcmController extends Controller
         $Devices = $request->input('id');
 
         foreach ($Devices as $Device) {
-            $id = $Device['device'] . '_' . $Device['position'];
+            $id = $Device['position'] . '_' . $Device['device'];
             $MqttMessage = json_encode($Datas);
             $this->SendMsgViaMqtt($MqttMessage, $id);
         }
