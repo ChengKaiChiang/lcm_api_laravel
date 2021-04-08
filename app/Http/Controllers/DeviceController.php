@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DeviceController extends Controller
 {
@@ -18,7 +19,32 @@ class DeviceController extends Controller
     public function index()
     {
         //
-        return response()->json(['data' => Device::all(), 'now_time' => date("Y-m-d H:i:s")], 200);
+        $datas = Device::all();
+        $res = collect();
+        $online = 0;
+        foreach ($datas as $data) {
+            $data = collect($data);
+            $LastUpdateTime =  strtotime('now') - strtotime($data->get('update_at'));
+            if ($data->get('lcm_status') === '1' && $LastUpdateTime < 300) {
+                $Variant = 'success';
+                $online++;
+            } else if ($data->get('lcm_status') === '2') {
+                $Variant = 'danger';
+            } else if ($data->get('lcm_status') === '0') {
+                $Variant = 'secondary';
+            } else if ($LastUpdateTime > 300) {
+                $Variant = 'secondary';
+                $this->setDeviceOffline($data->get('id'));
+            }
+            $data->put('variant', $Variant);
+            $res->push($data->toArray());
+        }
+        // return response('Ok');
+        return response()->json([
+            'data' => $res,
+            'now_time' => date("Y-m-d H:i:s"),
+            'online' => $online
+        ], 200);
     }
 
     /**
