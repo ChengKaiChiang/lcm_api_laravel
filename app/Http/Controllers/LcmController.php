@@ -84,34 +84,50 @@ class LcmController extends Controller
         $Bpower = $request->input('backlight_power');
         $Bcurrent = $request->input('backlight_current');
 
-        DB::table('lcm_datas')
-            ->where('color', '=', $Color)
-            ->where('device', '=', $Device)
-            ->where('position', '=', $Position)
-            ->update([
-                'lcm_power' => $Lpower,
-                'lcm_current' => $Lcurrent,
-                'backlight_power' => $Bpower,
-                'backlight_current' => $Bcurrent,
-                'updated_at' => Carbon::now(),
-            ]);
+        $Threshold = 350;
 
-        if ($Bcurrent > 340 || $Bcurrent < 330) {
-            Device::where('device', '=', $Device)
-                ->where('position', '=', $Position)
-                ->update([
-                    'lcm_status' => 2,
-                    'status' => 0,
-                ]);
+        $Status = Device::where('device', '=', $Device)
+            ->where('position', '=', $Position)
+            ->select('model', 'status')
+            ->get();
+
+        if ($Status[0]['model'] != 'LQ144P1JX01')
+            $Threshold = 425;
+
+        if ($Status[0]['status'] == '1') {
+            return response()->json(['status' => 'updating'], 200);
+        } else if ($Status[0]['status'] == '2') {
+            return response()->json(['status' => 'error'], 200);
         } else {
-            Device::where('device', '=', $Device)
+            DB::table('lcm_datas')
+                ->where('color', '=', $Color)
+                ->where('device', '=', $Device)
                 ->where('position', '=', $Position)
                 ->update([
-                    'lcm_status' => 1,
-                    'status' => 0,
+                    'lcm_power' => $Lpower,
+                    'lcm_current' => $Lcurrent,
+                    'backlight_power' => $Bpower,
+                    'backlight_current' => $Bcurrent,
+                    'updated_at' => Carbon::now(),
                 ]);
+
+            if ($Bcurrent > ($Threshold + 20) || $Bcurrent < $Threshold) {
+                Device::where('device', '=', $Device)
+                    ->where('position', '=', $Position)
+                    ->update([
+                        'lcm_status' => 2,
+                        'status' => 0,
+                    ]);
+            } else {
+                Device::where('device', '=', $Device)
+                    ->where('position', '=', $Position)
+                    ->update([
+                        'lcm_status' => 1,
+                        'status' => 0,
+                    ]);
+            }
         }
-        return response()->json(['status' => 'OK'], 200);
+        return response()->json(['status' => 'Data update success'], 200);
     }
 
 

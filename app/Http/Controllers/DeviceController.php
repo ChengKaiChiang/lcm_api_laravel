@@ -24,12 +24,13 @@ class DeviceController extends Controller
         $online = 0;
         foreach ($datas as $data) {
             $data = collect($data);
-            $LastUpdateTime =  strtotime('now') - strtotime($data->get('update_at'));
+            $LastUpdateTime =  strtotime('now') - strtotime($data->get('updated_at'));
             if ($data->get('lcm_status') === '1' && $LastUpdateTime < 300) {
                 $Variant = 'success';
                 $online++;
-            } else if ($data->get('lcm_status') === '2') {
+            } else if ($data->get('lcm_status') === '2' && $LastUpdateTime < 300) {
                 $Variant = 'danger';
+                $online++;
             } else if ($data->get('lcm_status') === '0') {
                 $Variant = 'secondary';
             } else if ($LastUpdateTime > 300) {
