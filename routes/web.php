@@ -26,3 +26,9 @@ Route::put('/setDeviceOffline/{id}', 'DeviceController@setDeviceOffline');
 Route::apiResource('/model', 'ModelController');
 Route::apiResource('/firmware', 'FirmwareController');
 Route::apiResource('/device', 'DeviceController');
+
+Route::post('/device/ReceiveMQTT', 'DeviceController@ReceiveMQTT');
+Route::post('/device/StartDownload', 'DeviceController@StartDownload');
+Route::post('/device/EndDownload', 'DeviceController@EndDownload');
+
+Route::get('/test', 'LcmController@test');

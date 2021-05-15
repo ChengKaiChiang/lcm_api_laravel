@@ -187,4 +187,71 @@ class DeviceController extends Controller
         }
         return response()->json(['status' => 'OK'], 200);
     }
+
+    public function ReceiveMQTT(Request $request)
+    {
+        //
+        $Device = $request->input('deviceID');
+        $Position = $request->input('deviceLocation');
+        $time = Carbon::now()->toDate()->format('Y-m-d H:i:s.u');
+        try {
+            Device::where('device', '=', $Device)
+                ->where('position', '=', $Position)
+                ->update([
+                    'receive_mqtt_at' => $time,
+                ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1], 'DataBase_Error' => $errorInfo[2]], 400);
+            // Return the response to the client..
+        }
+
+        return response()->json(['status' => $time], 200);
+    }
+
+    public function StartDownload(Request $request)
+    {
+        //
+        $Device = $request->input('deviceID');
+        $Position = $request->input('deviceLocation');
+
+        try {
+            Device::where('device', '=', $Device)
+                ->where('position', '=', $Position)
+                ->update([
+                    'start_download_at' => Carbon::now()->toDate()->format('Y-m-d H:i:s.u'),
+                ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1], 'DataBase_Error' => $errorInfo[2]], 400);
+            // Return the response to the client..
+        }
+        return response()->json(['status' => 'OK'], 200);
+    }
+
+    public function EndDownload(Request $request)
+    {
+        //
+        $Device = $request->input('deviceID');
+        $Position = $request->input('deviceLocation');
+
+        try {
+            Device::where('device', '=', $Device)
+                ->where('position', '=', $Position)
+                ->update([
+                    'end_download_at' => Carbon::now()->toDate()->format('Y-m-d H:i:s.u'),
+                ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // You can check get the details of the error using `errorInfo`:
+            $errorInfo = $exception->errorInfo;
+
+            return response()->json(['DataBase_ErrorCode' => $errorInfo[1], 'DataBase_Error' => $errorInfo[2]], 400);
+            // Return the response to the client..
+        }
+        return response()->json(['status' => 'OK'], 200);
+    }
 }
