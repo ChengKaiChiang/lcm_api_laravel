@@ -21,7 +21,8 @@ return [
         'model', 'model/*',
         'firmware', 'firmware/*',
         'FOTA', 'updateData',
-        'getStatus', 'setDeviceOffline/*'
+        'getStatus', 'setDeviceOffline/*',
+        'signin', 'signout', 'user', 'signup'
     ],
 
     'allowed_methods' => ['*'],

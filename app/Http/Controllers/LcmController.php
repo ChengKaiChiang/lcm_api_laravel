@@ -11,20 +11,6 @@ use Carbon\Carbon;
 
 class LcmController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $datas = LcmInfo::with(array('lcmmodel' => function ($query) {
-            $query->select('id', 'model_name');
-        }))->get();
-
-        return response()->json(['data' => $datas], 200);
-    }
-
     public function updateLcmModel(Request $request)
     {
         $Datas = $request->all();
@@ -160,11 +146,5 @@ class LcmController extends Controller
         }
 
         return "Failed";
-    }
-
-
-    public function test()
-    {
-        return response(Carbon::now());
     }
 }

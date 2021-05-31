@@ -13,12 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/lcm', 'LcmController@index');
-Route::post('/mqtt', 'LcmController@mqtt');
 Route::post('/getStatus', 'LcmController@getStatus');
 Route::post('/FOTA', 'LcmController@updateLcmModel');
 Route::post('/updateData', 'LcmController@updateData');
@@ -31,4 +25,10 @@ Route::post('/device/ReceiveMQTT', 'DeviceController@ReceiveMQTT');
 Route::post('/device/StartDownload', 'DeviceController@StartDownload');
 Route::post('/device/EndDownload', 'DeviceController@EndDownload');
 
-Route::get('/test', 'LcmController@test');
+Route::post('/signup', 'AuthController@signup');
+Route::post('/signin', 'AuthController@signin');
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/user', 'AuthController@user');
+    Route::get('/signout', 'AuthController@signout');
+});
