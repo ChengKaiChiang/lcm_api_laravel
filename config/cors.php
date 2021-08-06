@@ -22,7 +22,7 @@ return [
         'firmware', 'firmware/*',
         'FOTA', 'updateData',
         'getStatus', 'setDeviceOffline/*',
-        'signin', 'signout', 'user', 'signup'
+        'signin', 'signout', 'user', 'signup', 'optical'
     ],
 
     'allowed_methods' => ['*'],

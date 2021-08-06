@@ -13,22 +13,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// For web application
+Route::apiResource('/device', 'DeviceController');
 Route::post('/getStatus', 'LcmController@getStatus');
 Route::post('/FOTA', 'LcmController@updateLcmModel');
-Route::post('/updateData', 'LcmController@updateData');
-Route::put('/setDeviceOffline/{id}', 'DeviceController@setDeviceOffline');
-Route::apiResource('/model', 'ModelController');
-Route::apiResource('/firmware', 'FirmwareController');
-Route::apiResource('/device', 'DeviceController');
+Route::get('/optical', 'OpticalController@index');
 
+Route::put('/setDeviceOffline/{id}', 'DeviceController@setDeviceOffline');
+
+# For IoT devices
+Route::post('/updateData', 'LcmController@updateData');
 Route::post('/device/ReceiveMQTT', 'DeviceController@ReceiveMQTT');
 Route::post('/device/StartDownload', 'DeviceController@StartDownload');
 Route::post('/device/EndDownload', 'DeviceController@EndDownload');
 
+// For Identity verification
 Route::post('/signup', 'AuthController@signup');
 Route::post('/signin', 'AuthController@signin');
 
+// For web application
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/user', 'AuthController@user');
     Route::get('/signout', 'AuthController@signout');
+    Route::apiResource('/model', 'ModelController');
+    Route::apiResource('/firmware', 'FirmwareController');
 });
